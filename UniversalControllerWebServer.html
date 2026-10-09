@@ -169,7 +169,7 @@
          * The key on the left is the physical button.
          * The value on the right is what the controller will tell the console was pressed.
          */
-        const defaultMappings = {
+                const defaultMappings = {
 
             "A": "A",
             "B": "B",
@@ -178,12 +178,11 @@
 
             "Left Bumper": "Left Bumper",
             "Right Bumper": "Right Bumper",
+            "Left Trigger": "Left Trigger",
+            "Right Trigger": "Right Trigger",
 
             "Left Stick": "Left Stick",
             "Right Stick": "Right Stick",
-			
-			"Left Trigger": "Left Trigger",
-            "Right Trigger": "Right Trigger",
 
             "D-Pad Up": "D-Pad Up",
             "D-Pad Down": "D-Pad Down",
@@ -191,43 +190,95 @@
             "D-Pad Right": "D-Pad Right",
 
             "Start": "Start",
-            "Select": "Select"
+            "Select": "Select",
+            "Share": "Share",
+            "Home": "Home"
         };
-		const defaultXboxMappings = {
-		
-			"A": "A",
+
+        const defaultXboxMappings = {
+            "A": "A",
             "B": "B",
             "X": "X",
             "Y": "Y",
 
-            "Left Bumper": "Left Bumper",
-            "Right Bumper": "Right Bumper",
+            "LB": "LB",
+            "RB": "RB",
+            "LT": "LT",
+            "RT": "RT",
 
             "Left Stick": "Left Stick",
             "Right Stick": "Right Stick",
-			
-			"Left Trigger": "Left Trigger",
-            "Right Trigger": "Right Trigger",
 
             "D-Pad Up": "D-Pad Up",
             "D-Pad Down": "D-Pad Down",
             "D-Pad Left": "D-Pad Left",
             "D-Pad Right": "D-Pad Right",
 
-            "Start": "Start",
-            "Select": "Select"
+            "Menu": "Menu",
+            "View": "View",
+            "Share": "Share",
+            "Xbox": "Xbox"
         };
-		const defaultDualshockMappings = {
-		
-			"X": "X",
-            "O": "O",
-            "Triangle": "Triange",
-            "Square": "Square",
+        
+        const xboxToPlaystation = {
+            "A": "X",
+            "B": "○",
+            "X": "□",
+            "Y": "△",
+
+            "Left Bumper": "L1",
+            "Right Bumper": "R1",
+            "Left Trigger": "L2",
+            "Right Trigger": "R2",
+
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Menu": "Options",
+            "View": "ToushPad",
+            "Share":"Share",
+            "Xbox": "PS"
+        };
+
+        const xboxToSwitch = {
+            "A": "B",
+            "B": "A",
+            "X": "Y",
+            "Y": "X",
+
+            "LB": "L",
+            "RB": "R",
+            "LT": "ZL",
+            "RT": "ZR",
+
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Menu": "Start",
+            "View": "Select",
+            "Share": "Share",
+            "Xbox": "Home"
+        };
+
+        const defaultDualshockMappings = {
+            "X": "X",
+            "○": "○",
+            "△": "△",
+            "□": "□",
 
             "L1": "L1",
             "R1": "R1",
-			
-			"L2": "L2",
+            "L2": "L2",
             "R2": "R2",
 
             "L3": "L3",
@@ -239,10 +290,62 @@
             "D-Pad Right": "D-Pad Right",
 
             "Options": "Options",
-            "Share": "Share"
+            "TouchPad": "TouchPad",
+            "Share": "Share",
+            "PS": "PS"
         };
 
-		const defaultSwitch = {
+        const dualshockToSwitch = {
+            "X": "B",
+            "○": "A",
+            "△": "X",
+            "□": "Y",
+
+            "L1": "L",
+            "R1": "R",
+            "L2": "ZL",
+            "R2": "ZR",
+
+            "L3": "Left Stick",
+            "R3": "Right Stick",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Options": "+",
+            "TouchPad": "-",
+            "Share": "Capture",
+            "PS": "Home"
+        };
+
+        const dualshockToXbox = {
+            "X": "A",
+            "○": "B",
+            "△": "Y",
+            "□": "X",
+
+            "L1": "LB",
+            "R1": "RB",
+            "L2": "LT",
+            "R2": "RT",
+
+            "L3": "L3",
+            "R3": "R3",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Options": "Menu",
+            "TouchPad": "View",
+            "Share": "Share",
+            "PS": "Xbox"
+        };
+
+        const defaultSwitch = {
             "A": "A",
             "B": "B",
             "X": "X",
@@ -250,8 +353,8 @@
             
             "L": "L",
             "R": "R",
-            "ZL": "L",
-            "ZR": "R",
+            "ZL": "ZL",
+            "ZR": "ZR",
             
             "Left Stick": "Left Stick",
             "Right Stick": "Right Stick",
@@ -261,12 +364,13 @@
             "D-Pad Left": "D-Pad Left",
             "D-Pad Right": "D-Pad Right",
 
-            "Start": "Start",
-            "Select": "Select",
-            "Capture": "Capture"
+            "+": "+",
+            "-": "-",
+            "Capture": "Capture",
+            "Home": "Home"
         };
-		
-		const switchToXbox = {
+
+        const switchToXbox = {
             "A": "B",
             "B": "A",
             "X": "Y",
@@ -285,9 +389,10 @@
             "D-Pad Left": "D-Pad Left",
             "D-Pad Right": "D-Pad Right",
 
-            "Start": "Start",
-            "Select": "Select",
-			"Capture": "Share"
+            "+": "Menu",
+            "-": "View",
+            "Capture": "Share",
+            "Home": "Xbox"
         };
 
         const switchToPlaystation = {
@@ -309,9 +414,10 @@
             "D-Pad Left": "D-Pad Left",
             "D-Pad Right": "D-Pad Right",
             
-            "Start": "Start",
-            "Select": "Select",
-			"Capture": "Share"
+            "Start": "Options",
+            "Select": "Touchpad",
+            "Capture": "Share",
+            "Home":"PS"
         };
 
         function initializePage() {
