@@ -169,31 +169,6 @@
          * The key on the left is the physical button.
          * The value on the right is what the controller will tell the console was pressed.
          */
-                const defaultMappings /*= {
-
-            "A": "A",
-            "B": "B",
-            "X": "X",
-            "Y": "Y",
-
-            "Left Bumper": "Left Bumper",
-            "Right Bumper": "Right Bumper",
-            "Left Trigger": "Left Trigger",
-            "Right Trigger": "Right Trigger",
-
-            "Left Stick": "Left Stick",
-            "Right Stick": "Right Stick",
-
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "Start": "Start",
-            "Select": "Select",
-            "Share": "Share",
-            "Home": "Home"
-        }*/;
 
         const defaultXboxMappings = {
             "A": "A",
@@ -419,62 +394,10 @@
             "Capture": "Share",
             "Home":"PS"
         };
+		
+		let defaultMappings = defaultXboxMappings;
 
-        function initializePage() {
-            createRemappingRows();
-        }
-
-
-        // Creates the input remapping rows.
-        function createRemappingRows() {
-            const remappingArea = document.getElementById("remappingArea");
-
-            // Clear the remapping area.
-            remappingArea.innerHTML = "";
-            
-            // Loop through every physical button.
-            for (let physicalButton in defaultMappings) {
-                const row = document.createElement("div");
-                row.className = "remap-row";
-
-                // Physical button name
-                const physical = document.createElement("div");
-                physical.className = "physical-button";
-                physical.textContent = physicalButton;
-
-                // Arrow
-                const arrow = document.createElement("div");
-                arrow.className = "arrow";
-                arrow.textContent = "→";
-
-                // Dropdown containing possible outputs
-                const select = document.createElement("select");
-                select.className = "output-button";
-
-                // Create option for all possible controller input.
-                for (let outputButton in defaultMappings) {
-                    const option = document.createElement("option");
-                    option.value = outputButton;
-                    option.textContent = outputButton;
-
-                    // Select default mapping.
-                    if (outputButton === physicalButton) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
-                }
-
-                // Add everything to the row.
-                row.appendChild(physical);
-                row.appendChild(arrow);
-                row.appendChild(select);
-                remappingArea.appendChild(row);
-            }
-
-        }
-
-
-        // Apply the selected controller configuration.
+// Apply the selected controller configuration.
         function applySettings() {
             const controller = document.getElementById("controllerType").value;
             const consoleType = document.getElementById("consoleType").value;
@@ -482,33 +405,35 @@
 			switch (controller){
 				case "Nintendo Switch Pro Controller":
 					if (consoleType == "Nintendo Switch")
-						defaultMappings = defaultSwitch;
-					else if (consoleType == "Playstation 5")
-						defaultMappings = switchToPlaystation;
+						 defaultMappings = defaultSwitch;
+					else if (consoleType == "PlayStation 5")
+						 defaultMappings = switchToPlaystation;
 					else
-						defaultMappings = switchToXbox;
+						 defaultMappings = switchToXbox;
 					break;
 				case "Xbox One":
 					if (consoleType == "Nintendo Switch")
-						defaultMappings = xboxToSwitch;
-					else if (consoleType == "Playstation 5")
-						defaultMappings = xboxToPlaystation;
+						 defaultMappings = xboxToSwitch;
+					else if (consoleType == "PlayStation 5")
+						 defaultMappings = xboxToPlaystation;
 					else
-						defaultMappings = defaultXboxMappings;
+						 defaultMappings = defaultXboxMappings;
 					break;
-				case "Dualshock":
+				case "DualShock":
 					if (consoleType == "Nintendo Switch")
-						defaultMappings = dualshockToSwitch;
-					else if (consoleType == "Playstation 5")
-						defaultMappings = defaultDualshockMappings;
+						 defaultMappings = dualshockToSwitch;
+					else if (consoleType == "PlayStation 5")
+						 defaultMappings = defaultDualshockMappings;
 					else
-						defaultMappings = dualshockToXbox;
+						 defaultMappings = dualshockToXbox;
 					/*break;
 				default:
 					if (consoleType == "Nintendo Switch")
 					else if (consoleType == "Playstation 5")
 					else*/
 			}
+			
+			createRemappingRows();
 
             // Get all of the remapping dropdowns.
             const remappingSelects = document.querySelectorAll(".output-button");
@@ -542,6 +467,63 @@
             createRemappingRows();
             document.getElementById("status").style.display = "none";
         }
+
+        function initializePage() {
+            createRemappingRows();
+        }
+
+
+        // Creates the input remapping rows.
+        function createRemappingRows() {
+            const remappingArea = document.getElementById("remappingArea");
+
+            // Clear the remapping area.
+            remappingArea.innerHTML = "";
+            
+            // Loop through every physical button.
+            for (let physicalButton in defaultMappings) {
+                const row = document.createElement("div");
+                row.className = "remap-row";
+
+                // Physical button name
+                const physical = document.createElement("div");
+                physical.className = "physical-button";
+                physical.textContent = physicalButton;
+
+                // Arrow
+                const arrow = document.createElement("div");
+                arrow.className = "arrow";
+                arrow.textContent = "→";
+
+                // Dropdown containing possible outputs
+                const select = document.createElement("select");
+                select.className = "output-button";
+
+                // Create option for all possible controller input.
+                for (let outputButton of Object.values(defaultMappings)) {
+					const option = document.createElement("option");
+
+					option.value = outputButton;
+					option.textContent = outputButton;
+
+					if (outputButton === defaultMappings[physicalButton]) {
+						option.selected = true;
+					}
+
+					select.appendChild(option);
+				}
+
+                // Add everything to the row.
+                row.appendChild(physical);
+                row.appendChild(arrow);
+                row.appendChild(select);
+                remappingArea.appendChild(row);
+            }
+
+        }
+
+
+        
     </script>
 </head>
 
