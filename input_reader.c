@@ -1,19 +1,24 @@
 // Author: AJ Tomalino
 // File: input_reader.c
 // Purpose: read and write controller inputs using the EVDEV linux kernel API
-// Compilation: gcc input_reader.c
+// Compilation: gcc input_reader.c dyArray.c
 // Template from github/MysteriousJ/Joystick-Input-Examples
 
 // Libraries
 
+#include "dyArray.h"
+#include <bits/types/struct_timeval.h>
 #include <dirent.h>
+// #include <errno.h>
 #include <fcntl.h>
 #include <linux/input-event-codes.h>
 #include <linux/input.h>
 #include <linux/joystick.h>
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+// #include <string.h>
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -22,49 +27,41 @@
 
 // Compiler Macros
 
-#define MAXBUTTONS 32
-#define MAXAXES 32
 #define MAXFILENAMESIZE 128
+
+// Global Variables
+
+dyArray input_queue;
 
 // Structs
 
 typedef struct {
-  int min;
-  int max;
-  int value;
-} Axis;
-
-struct JoystickState {
-  bool connected;
-  unsigned int deviceNumber;
-  int file;
-  bool buttons[MAXBUTTONS];
-  Axis axes[MAXAXES];
-  char name[128];
-  bool hasRumble;
-  short rumbleEffectID;
-};
-
-struct Joysticks {
-  unsigned int count;
-  struct JoystickState *states;
-};
+  int ev_fd;
+  pthread_t tid;
+} thread_event;
 
 // Function Prototypes
 
-int open_joysticks(struct Joysticks *);
-void close_joystick(struct Joysticks *);
-void read_joystick(struct JoystickState *);
-void set_joystick_rumble(struct JoystickState *, short, short);
+void *runner(void *);
+unsigned int open_joysticks(thread_event *);
+// void set_joystick_rumble(struct JoystickState *, short, short);
+
+bool pq_enqueue(dyArray *, struct input_event *);
+struct input_event pq_dequeue(dyArray *);
+int timeval_cmp(struct timeval a, struct timeval b);
 
 // Main
 
 int main() {
-  struct Joysticks js = {0};
-  int ret = open_joysticks(&js);
-  if (ret == EXIT_FAILURE) {
-    return ret;
-  } // if failed to open joystick
+  // Initialize open controllers
+  thread_event *open_events;
+  unsigned int num_open_events = open_joysticks(open_events);
+  if (num_open_events == 0) {
+    return EXIT_FAILURE;
+  }
+
+  // Initialize queue
+  input_queue = array_init(sizeof(struct input_event));
 
   // Add hook to check /dev/input/
   int deviceChangeNotify = inotify_init1(IN_NONBLOCK);
@@ -74,47 +71,51 @@ int main() {
     // read hook to check if /dev/input/ changed
     char buffer[4096];
     if (read(deviceChangeNotify, buffer, sizeof(buffer)) != -1) {
-      close_joystick(&js);
-      open_joysticks(&js);
+      // close_joystick(open_events, num_open_events);
+      free(open_events);
+      num_open_events = open_joysticks(open_events);
+      // printf("%d\n", num_open_events);
     }
 
-    // update controller states
-    for (int i = 0; i < js.count; i++) {
-      struct JoystickState *j = &js.states[i];
-      if (j->connected) {
-        // read
-        read_joystick(j);
-
-        // print
-        fprintf(stdout, "%s: ", j->name);
-        for (int i = 0; i < MAXAXES; i++) {
-          if (!(j->axes[i].max == 0 && j->axes[i].min == 0)) {
-            fprintf(stdout, "Axis %d: %d ", i, j->axes[i].value);
-          }
-        }
-        fprintf(stdout, "Buttons: ");
-        for (int i = 0; i < MAXBUTTONS; i++) {
-          if (j->buttons[i]) {
-            fprintf(stdout, "%d ", i);
-          }
-        }
-        fprintf(stdout, "\n");
-      }
+    struct input_event ev;
+    if (input_queue.len > 0) {
+      ev = pq_dequeue(&input_queue);
+      printf("%d.%d, %x, %x, %d\n", (int)ev.time.tv_sec, (int)ev.time.tv_usec,
+             ev.type, ev.code, ev.value);
     }
-    fflush(stdout);
-    usleep(16000);
   }
 }
 
 // Functions
 
-int open_joysticks(struct Joysticks *js) {
+void *runner(void *args) {
+  char name[128];
+  int fd = *(int *)args;
+  ioctl(fd, EVIOCGNAME(128), name);
+  printf("%s\n", name);
+  fflush(stdout);
+  while (1) {
+    struct input_event ev;
+    while (read(fd, &ev, sizeof(ev)) > 0) {
+      pq_enqueue(&input_queue, &ev);
+      usleep(16000);
+    }
+  }
+  close(fd);
+
+  pthread_exit(0);
+}
+
+unsigned int open_joysticks(thread_event *open_threads) {
   // open /dev/input/
   DIR *dir = opendir("/dev/input/");
   if (dir == NULL) {
     perror("Could not open /dev/input/");
-    return EXIT_FAILURE;
+    return 0;
   }
+
+  open_threads = (thread_event *)malloc(sizeof(thread_event));
+  unsigned int n = 0;
 
   // iterate through /dev/input/
   struct dirent *entry = NULL;
@@ -125,79 +126,63 @@ int open_joysticks(struct Joysticks *js) {
       char path[MAXFILENAMESIZE];
       sprintf(path, "/dev/input/%s", entry->d_name);
       int fd = open(path, O_RDWR | O_NONBLOCK);
+      // printf("Found: %s\n", path);
+      // opens any device with read-write permission
+      // fails if else
       if (fd != -1) {
-        // init state
-        struct JoystickState j = {0};
-        j.deviceNumber = ev_num;
-        j.file = fd;
-        j.connected = true;
-
-        // get name
-        ioctl(fd, EVIOCGNAME(sizeof(j.name)), j.name);
-
-        // init axes
-        for (int i = 0; i < MAXAXES; i++) {
-          struct input_absinfo axisInfo;
-          if (ioctl(fd, EVIOCGABS(i), &axisInfo) != -1) {
-            j.axes[i].min = axisInfo.minimum;
-            j.axes[i].max = axisInfo.maximum;
-          }
+        // printf("Opened: %s\n", path);
+        open_threads =
+            (thread_event *)realloc(open_threads, ++n * sizeof(thread_event));
+        if (open_threads == NULL) {
+          perror("Realloc failed");
+          exit(EXIT_FAILURE);
         }
-
-        // it is unnecessary to init buttons
-
-        // init rumble
-        // ...
-
-        // add to states
-        bool previously_connected = false;
-        for (int i = 0; i < js->count; i++) {
-          if (js->states[i].deviceNumber == ev_num) {
-            js->states[i] = j;
-            previously_connected = true;
-          }
-        }
-        if (!previously_connected) {
-          js->count++;
-          js->states = (struct JoystickState *)realloc(
-              js->states, sizeof(struct JoystickState) * js->count);
-          js->states[js->count - 1] = j;
-        }
+        open_threads[n - 1].ev_fd = fd;
       }
     }
   }
-  for (int i = 0; i < js->count; i++) {
-    if (js->states[i].connected) {
-      printf("Connected: %s\n", js->states[i].name);
-    }
+  for (int i = 0; i < n; i++) {
+    open_threads[i].tid = pthread_create(&open_threads[i].tid, NULL, runner,
+                                         &open_threads[i].ev_fd);
   }
 
   fflush(stdout);
 
-  return EXIT_SUCCESS;
+  return n;
 }
 
-void close_joystick(struct Joysticks *js) {
-  for (int i = 0; i < js->count; i++) {
-    if (js->states->connected) {
-      close(js->states[i].file);
-      js->states[i].connected = false;
-      printf("Disconnected: %s\n", js->states[i].name);
+// void set_joystick_rumble(struct JoystickState *j, short weak_rumble,
+//                          short strong_rumble) {}
+
+bool pq_enqueue(dyArray *dy, struct input_event *ev) {
+  // O(n) insert
+  // sort by highest (most recent) time
+  for (int i = 0; i < dy->len; i++) {
+    if (timeval_cmp(ev->time, ((struct input_event *)array_at(dy, i))->time) >
+        0) {
+      return array_insert(dy, ev, i);
     }
   }
+  return array_push(dy, ev);
 }
 
-void read_joystick(struct JoystickState *j) {
-  struct input_event ev;
-  while (read(j->file, &ev, sizeof(ev)) > 0) {
-    if (ev.type == EV_KEY && ev.code >= BTN_JOYSTICK && ev.code <= BTN_THUMBR) {
-      j->buttons[ev.code - 0x120] = ev.value;
-    }
-    if (ev.type == EV_ABS && ev.code <= ABS_TOOL_WIDTH) {
-      j->axes[ev.code].value = ev.value;
-    }
+struct input_event pq_dequeue(dyArray *dy) {
+  // O(n) remove
+  // O(1) search
+  struct input_event ret = *(struct input_event *)array_at(dy, 0);
+  array_rmv(dy, 0);
+  return ret;
+}
+
+// return  <0 if a < b
+//         0  if a == b
+//         >0 if a > b
+int timeval_cmp(struct timeval a, struct timeval b) {
+  struct timeval res;
+  res.tv_sec = a.tv_sec - b.tv_sec;
+  res.tv_usec = a.tv_usec - b.tv_usec;
+  if (res.tv_sec == 0) {
+    return res.tv_usec;
   }
+  return res.tv_sec;
 }
-
-void set_joystick_rumble(struct JoystickState *j, short weak_rumble,
-                         short strong_rumble) {}
