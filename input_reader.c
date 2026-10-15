@@ -65,7 +65,8 @@ int main() {
 
   // Add hook to check /dev/input/
   int deviceChangeNotify = inotify_init1(IN_NONBLOCK);
-  inotify_add_watch(deviceChangeNotify, "/dev/input", IN_ATTRIB);
+  int deviceWatch =
+      inotify_add_watch(deviceChangeNotify, "/dev/input", IN_ATTRIB);
 
   while (1) {
     // read hook to check if /dev/input/ changed
@@ -84,6 +85,22 @@ int main() {
              ev.type, ev.code, ev.value);
     }
   }
+
+  // technically this code is never executed but its good practice
+  // may do a signal intercept to make SIG_INT execute this
+
+  array_free(&input_queue);
+
+  for (int i = 0; i < num_open_events; i++) {
+    pthread_cancel(open_events[i].tid);
+    close(open_events[i].ev_fd);
+  }
+
+  free(open_events);
+
+  inotify_rm_watch(deviceChangeNotify, deviceWatch);
+
+  return 0;
 }
 
 // Functions
@@ -146,7 +163,7 @@ unsigned int open_joysticks(thread_event *open_threads) {
                                          &open_threads[i].ev_fd);
   }
 
-  fflush(stdout);
+  // fflush(stdout);
 
   return n;
 }
