@@ -459,6 +459,25 @@
             const status = document.getElementById("status");
             status.innerHTML = message;
             status.style.display = "block";
+			
+			const jsonString = JSON.stringify(defaultMappings, null, 2);
+
+			// 3. Create a Blob object with the JSON data
+			const blob = new Blob([jsonString], { type: "application/json" });
+
+			// 4. Create a temporary URL pointing to that Blob
+			const url = URL.createObjectURL(blob);
+
+			// 5. Create a hidden anchor element, set its target, and click it
+			const downloadLink = document.createElement('a');
+			downloadLink.href = url;
+			downloadLink.download = 'test.json'; // The name of the file to save
+
+			// 6. Trigger the download and clean up
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+			document.body.removeChild(downloadLink);
+			URL.revokeObjectURL(url); // Free up memory
         }
 
 
