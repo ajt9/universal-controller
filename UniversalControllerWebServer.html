@@ -395,7 +395,237 @@
             "Home":"PS"
         };
 		
+		
+		
+		//Consts to read into JSON depending on controller/console type
+        const defaultXboxJson = {
+            "A": "A",
+            "B": "B",
+            "X": "X",
+            "Y": "Y",
+
+            "LB": "LB",
+            "RB": "RB",
+            "LT": "LT",
+            "RT": "RT",
+
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Menu": "Menu",
+            "View": "View",
+            "Share": "Share",
+            "Xbox": "Xbox"
+        };
+        
+        const xboxToPlaystationJson = {
+            "A": "X",
+            "B": "○",
+            "X": "□",
+            "Y": "△",
+
+            "LB": "L1",
+            "RB": "R1",
+            "LT": "L2",
+            "RT": "R2",
+
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Menu": "Options",
+            "View": "TouchPad",
+            "Share":"Share",
+            "Xbox": "PS"
+        };
+
+        const xboxToSwitchJson = {
+            "A": "B",
+            "B": "A",
+            "X": "Y",
+            "Y": "X",
+
+            "LB": "L",
+            "RB": "R",
+            "LT": "ZL",
+            "RT": "ZR",
+
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Menu": "Start",
+            "View": "Select",
+            "Share": "Share",
+            "Xbox": "Home"
+        };
+
+        const defaultDualshockJson = {
+            "X": "X",
+            "○": "○",
+            "△": "△",
+            "□": "□",
+
+            "L1": "L1",
+            "R1": "R1",
+            "L2": "L2",
+            "R2": "R2",
+
+            "L3": "L3",
+            "R3": "R3",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Options": "Options",
+            "TouchPad": "TouchPad",
+            "Share": "Share",
+            "PS": "PS"
+        };
+
+        const dualshockToSwitchJson = {
+            "X": "B",
+            "○": "A",
+            "△": "X",
+            "□": "Y",
+
+            "L1": "L",
+            "R1": "R",
+            "L2": "ZL",
+            "R2": "ZR",
+
+            "L3": "Left Stick",
+            "R3": "Right Stick",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Options": "+",
+            "TouchPad": "-",
+            "Share": "Capture",
+            "PS": "Home"
+        };
+
+        const dualshockToXboxJson = {
+            "X": "A",
+            "○": "B",
+            "△": "Y",
+            "□": "X",
+
+            "L1": "LB",
+            "R1": "RB",
+            "L2": "LT",
+            "R2": "RT",
+
+            "L3": "L3",
+            "R3": "R3",
+
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "Options": "Menu",
+            "TouchPad": "View",
+            "Share": "Share",
+            "PS": "Xbox"
+        };
+
+        const defaultSwitchJson = {
+            "A": "A",
+            "B": "B",
+            "X": "X",
+            "Y": "Y",
+            
+            "L": "L",
+            "R": "R",
+            "ZL": "ZL",
+            "ZR": "ZR",
+            
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+            
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "+": "+",
+            "-": "-",
+            "Capture": "Capture",
+            "Home": "Home"
+        };
+
+        const switchToXboxJson = {
+            "A": "B",
+            "B": "A",
+            "X": "Y",
+            "Y": "X",
+            
+            "L": "LB",
+            "R": "RB",
+            "ZL": "LT",
+            "ZR": "RT",
+            
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+            
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+
+            "+": "Menu",
+            "-": "View",
+            "Capture": "Share",
+            "Home": "Xbox"
+        };
+
+        const switchToPlaystationJson = {
+            "A": "○",
+            "B": "X",
+            "X": "△",
+            "Y": "□",
+            
+            "L": "L1",
+            "R": "R1",
+            "ZL": "L2",
+            "ZR": "R2",
+
+            "Left Stick": "Left Stick",
+            "Right Stick": "Right Stick",
+            
+            "D-Pad Up": "D-Pad Up",
+            "D-Pad Down": "D-Pad Down",
+            "D-Pad Left": "D-Pad Left",
+            "D-Pad Right": "D-Pad Right",
+            
+            "Start": "Options",
+            "Select": "TouchPad",
+            "Capture": "Share",
+            "Home":"PS"
+        };		
+		
 		let defaultMappings = defaultXboxMappings;
+		let jsonTitle = 'test.json';
+		let jsonChoice = defaultXboxJson;
 
 // Apply the selected controller configuration.
         function applySettings() {
@@ -404,28 +634,55 @@
 			
 			switch (controller){
 				case "Nintendo Switch Pro Controller":
-					if (consoleType == "Nintendo Switch")
+					if (consoleType == "Nintendo Switch"){
 						 defaultMappings = defaultSwitch;
-					else if (consoleType == "PlayStation 5")
+						 jsonTitle = 'defaultSwitch.json';
+						 jsonChoice = defaultSwitchJson;
+						 }
+					else if (consoleType == "PlayStation 5"){
 						 defaultMappings = switchToPlaystation;
-					else
+						 jsonTitle = 'switchToPlaystation.json';
+						 jsonChoice = switchToPlaystationJson;
+						 }
+					else{
 						 defaultMappings = switchToXbox;
+						 jsonTitle = 'switchToXbox.json';
+						 jsonChoice = switchToXboxJson;
+						 }
 					break;
 				case "Xbox One":
-					if (consoleType == "Nintendo Switch")
+					if (consoleType == "Nintendo Switch"){
 						 defaultMappings = xboxToSwitch;
-					else if (consoleType == "PlayStation 5")
+						 jsonTitle = 'xboxToSwitch.json';
+						 jsonChoice = xboxToSwitchJson;
+						 }
+					else if (consoleType == "PlayStation 5"){
 						 defaultMappings = xboxToPlaystation;
-					else
+						 jsonTitle = 'xboxToPlaystation.json';
+						 jsonChoice = xboxToPlaystationJson;
+						 }
+					else{
 						 defaultMappings = defaultXboxMappings;
+						 jsonTitle = 'defaultXbox.json';
+						 jsonChoice = defaultXboxJson;
+						 }
 					break;
 				case "DualShock":
-					if (consoleType == "Nintendo Switch")
+					if (consoleType == "Nintendo Switch"){
 						 defaultMappings = dualshockToSwitch;
-					else if (consoleType == "PlayStation 5")
+						 jsonTitle = 'dualshockToSwitch.json';
+						 jsonChoice = dualshockToSwitchJson;
+						 }
+					else if (consoleType == "PlayStation 5"){
 						 defaultMappings = defaultDualshockMappings;
-					else
+						 jsonTitle = 'defaultDualshock.json';
+						 jsonChoice = defaultDualshockJson;
+						 }
+					else{
 						 defaultMappings = dualshockToXbox;
+						 jsonTitle = 'dualshockToXbox.json';
+						 jsonChoice = dualshockToXboxJson;
+						 }
 					/*break;
 				default:
 					if (consoleType == "Nintendo Switch")
@@ -461,14 +718,14 @@
             status.style.display = "block";
 			
 			//create and download a json file
-			const jsonString = JSON.stringify(defaultMappings, null, 2);
+			const jsonString = JSON.stringify(jsonChoice, null, 2);
 
 			const blob = new Blob([jsonString], { type: "application/json" });
 			const url = URL.createObjectURL(blob);
 
 			const downloadLink = document.createElement('a');
 			downloadLink.href = url;
-			downloadLink.download = 'test.json'; // Change this later
+			downloadLink.download = jsonTitle; 
 			document.body.appendChild(downloadLink);
 			downloadLink.click();
 			document.body.removeChild(downloadLink);
