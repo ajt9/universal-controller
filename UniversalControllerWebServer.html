@@ -740,7 +740,13 @@
         }
 
         function initializePage() {
-            createRemappingRows();
+            // Set up the initial controller and console mappings.
+            applySettings(false);
+            
+            // Update mappings when console or controller is changed.
+            document.getElementById("controllerType").addEventListener("change", () => applySettings(false));
+            document.getElementById("consoleType")
+            .addEventListener("change", () => applySettings(false));
         }
 
 
