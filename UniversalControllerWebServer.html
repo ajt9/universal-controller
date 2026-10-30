@@ -399,81 +399,8 @@
 		
 		//Consts to read into JSON depending on controller/console type
         const defaultXboxJson = {
-            "A": "A",
-            "B": "B",
-            "X": "X",
-            "Y": "Y",
-
-            "LB": "LB",
-            "RB": "RB",
-            "LT": "LT",
-            "RT": "RT",
-
-            "Left Stick": "Left Stick",
-            "Right Stick": "Right Stick",
-
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "Menu": "Menu",
-            "View": "View",
-            "Share": "Share",
-            "Xbox": "Xbox"
-        };
-        
-        const xboxToPlaystationJson = {
-            "A": "X",
-            "B": "○",
-            "X": "□",
-            "Y": "△",
-
-            "LB": "L1",
-            "RB": "R1",
-            "LT": "L2",
-            "RT": "R2",
-
-            "Left Stick": "Left Stick",
-            "Right Stick": "Right Stick",
-
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "Menu": "Options",
-            "View": "TouchPad",
-            "Share":"Share",
-            "Xbox": "PS"
-        };
-
-        const xboxToSwitchJson = {
-            "A": "B",
-            "B": "A",
-            "X": "Y",
-            "Y": "X",
-
-            "LB": "L",
-            "RB": "R",
-            "LT": "ZL",
-            "RT": "ZR",
-
-            "Left Stick": "Left Stick",
-            "Right Stick": "Right Stick",
-
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "Menu": "Start",
-            "View": "Select",
-            "Share": "Share",
-            "Xbox": "Home"
-        };
-
-        const defaultDualshockJson = {
+            //PS Json: to be changed
+			"0" : {"0" : "EV_SYN"},
 			"1" : {
 				"304" : "(BTN_SOUTH)",
 				"305" : "(BTN_EAST)",
@@ -490,12 +417,125 @@
 				"318" : "(BTN_THUMBR)"
 				},
 			"3" : {
-				"0": ["ABS_X", 0, 255],
-				"1": ["ABS_Y", 0, 255],
-				"2": ["ABS_Z", 0, 255],
-				"3": ["ABS_RX", 0, 255],
-				"4": ["ABS_RY", 0, 255],
-				"5": ["ABS_RZ", 0, 255],
+				"0": ["ABS_X", 0, 255, 0, 0],
+				"1": ["ABS_Y", 0, 255, 0, 0],
+				"2": ["ABS_Z", 0, 255, 0, 0],
+				"3": ["ABS_RX", 0, 255, 0, 0],
+				"4": ["ABS_RY", 0, 255, 0, 0],
+				"5": ["ABS_RZ", 0, 255, 0, 0],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
+        
+        const xboxToPlaystationJson = {
+		//PS Json: to be changed
+            "0" : {"0" : "EV_SYN"},
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", 0, 255, 0, 0],
+				"1": ["ABS_Y", 0, 255, 0, 0],
+				"2": ["ABS_Z", 0, 255, 0, 0],
+				"3": ["ABS_RX", 0, 255, 0, 0],
+				"4": ["ABS_RY", 0, 255, 0, 0],
+				"5": ["ABS_RZ", 0, 255, 0, 0],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
+
+        const xboxToSwitchJson = {
+		//PS Json: to be changed
+            "0" : {"0" : "EV_SYN"},
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", 0, 255, 0, 0],
+				"1": ["ABS_Y", 0, 255, 0, 0],
+				"2": ["ABS_Z", 0, 255, 0, 0],
+				"3": ["ABS_RX", 0, 255, 0, 0],
+				"4": ["ABS_RY", 0, 255, 0, 0],
+				"5": ["ABS_RZ", 0, 255, 0, 0],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
+
+        const defaultDualshockJson = {
+			"0" : {"0" : "EV_SYN"},
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", 0, 255, 0, 0],
+				"1": ["ABS_Y", 0, 255, 0, 0],
+				"2": ["ABS_Z", 0, 255, 0, 0],
+				"3": ["ABS_RX", 0, 255, 0, 0],
+				"4": ["ABS_RY", 0, 255, 0, 0],
+				"5": ["ABS_RZ", 0, 255, 0, 0],
 				"16": ["ABS_HAT0X", -1, 1],
 				"17": ["ABS_HAT0Y", -1, 1]
 				},
@@ -510,6 +550,7 @@
 		};
 
         const dualshockToSwitchJson = {
+			"0" : {"0" : "EV_SYN"},
 			"1" : {
 				"304" : "(BTN_SOUTH)",
 				"305" : "(BTN_EAST)",
@@ -526,12 +567,12 @@
 				"318" : "(BTN_THUMBR)"
 				},
 			"3" : {
-				"0": ["ABS_X", 0, 255],
-				"1": ["ABS_Y", 0, 255],
-				"2": ["ABS_Z", 0, 255],
-				"3": ["ABS_RX", 0, 255],
-				"4": ["ABS_RY", 0, 255],
-				"5": ["ABS_RZ", 0, 255],
+				"0": ["ABS_X", 0, 255, 0, 0],
+				"1": ["ABS_Y", 0, 255, 0, 0],
+				"2": ["ABS_Z", 0, 255, 0, 0],
+				"3": ["ABS_RX", 0, 255, 0, 0],
+				"4": ["ABS_RY", 0, 255, 0, 0],
+				"5": ["ABS_RZ", 0, 255, 0, 0],
 				"16": ["ABS_HAT0X", -1, 1],
 				"17": ["ABS_HAT0Y", -1, 1]
 				},
@@ -546,6 +587,7 @@
 		};
 
         const dualshockToXboxJson = {
+			"0" : {"0" : "EV_SYN"},
 			"1" : {
 				"304" : "(BTN_SOUTH)",
 				"305" : "(BTN_EAST)",
@@ -562,12 +604,12 @@
 				"318" : "(BTN_THUMBR)"
 				},
 			"3" : {
-				"0": ["ABS_X", 0, 255],
-				"1": ["ABS_Y", 0, 255],
-				"2": ["ABS_Z", 0, 255],
-				"3": ["ABS_RX", 0, 255],
-				"4": ["ABS_RY", 0, 255],
-				"5": ["ABS_RZ", 0, 255],
+				"0": ["ABS_X", 0, 255, 0, 0],
+				"1": ["ABS_Y", 0, 255, 0, 0],
+				"2": ["ABS_Z", 0, 255, 0, 0],
+				"3": ["ABS_RX", 0, 255, 0, 0],
+				"4": ["ABS_RY", 0, 255, 0, 0],
+				"5": ["ABS_RZ", 0, 255, 0, 0],
 				"16": ["ABS_HAT0X", -1, 1],
 				"17": ["ABS_HAT0Y", -1, 1]
 				},
@@ -582,79 +624,112 @@
 		};
 
         const defaultSwitchJson = {
-            "A": "A",
-            "B": "B",
-            "X": "X",
-            "Y": "Y",
-            
-            "L": "L",
-            "R": "R",
-            "ZL": "ZL",
-            "ZR": "ZR",
-            
-            "Left Stick": "Left Stick",
-            "Right Stick": "Right Stick",
-            
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "+": "+",
-            "-": "-",
-            "Capture": "Capture",
-            "Home": "Home"
-        };
+            "0" : {"0" : "EV_SYN"},
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"309" : "(BTN_Z)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", -32767, 32767, 250, 500],
+				"1": ["ABS_Y", -32767, 32767, 250, 500],
+				"3": ["ABS_RX", 0, 255, 250, 500],
+				"4": ["ABS_RY", 0, 255, 250, 500],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
 
         const switchToXboxJson = {
-            "A": "B",
-            "B": "A",
-            "X": "Y",
-            "Y": "X",
-            
-            "L": "LB",
-            "R": "RB",
-            "ZL": "LT",
-            "ZR": "RT",
-            
-            "Left Stick": "Left Stick",
-            "Right Stick": "Right Stick",
-            
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "+": "Menu",
-            "-": "View",
-            "Capture": "Share",
-            "Home": "Xbox"
-        };
+            "0" : {"0" : "EV_SYN"},
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"309" : "(BTN_Z)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", -32767, 32767, 250, 500],
+				"1": ["ABS_Y", -32767, 32767, 250, 500],
+				"3": ["ABS_RX", 0, 255, 250, 500],
+				"4": ["ABS_RY", 0, 255, 250, 500],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
 
         const switchToPlaystationJson = {
-            "A": "○",
-            "B": "X",
-            "X": "△",
-            "Y": "□",
-            
-            "L": "L1",
-            "R": "R1",
-            "ZL": "L2",
-            "ZR": "R2",
-
-            "Left Stick": "Left Stick",
-            "Right Stick": "Right Stick",
-            
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-            
-            "Start": "Options",
-            "Select": "TouchPad",
-            "Capture": "Share",
-            "Home":"PS"
-        };		
+            "0" : {"0" : "EV_SYN"},
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"309" : "(BTN_Z)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", -32767, 32767, 250, 500],
+				"1": ["ABS_Y", -32767, 32767, 250, 500],
+				"3": ["ABS_RX", 0, 255, 250, 500],
+				"4": ["ABS_RY", 0, 255, 250, 500],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};		
 		
 		let defaultMappings = defaultXboxMappings;
 		let jsonTitle = 'test.json';
