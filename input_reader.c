@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <cjson/cJSON.h>
 
 // Compiler Macros
 
@@ -76,6 +77,25 @@ int main() {
   }
 
   // Initialize JSON Parser
+    FILE *fp = fopen("data.json", "r");
+    if (fp == NULL) {
+        printf("Error: Unable to open the file.\n");
+        return 1;
+    }
+
+    char buffer[2048];
+    int len = fread(buffer, 1, sizeof(buffer), fp);
+    fclose(fp);
+
+    cJSON *json = cJSON_Parse(buffer);
+    if (json == NULL) {
+        const char *error_ptr = cJSON_GetErrorPtr();
+        if (error_ptr != NULL) {
+            printf("Error: %s\n", error_ptr);
+        }
+        cJSON_Delete(json);
+        return 1;
+    }
 
   // Initialize socket
   struct sockaddr_un addr;
