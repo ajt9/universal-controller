@@ -474,79 +474,112 @@
         };
 
         const defaultDualshockJson = {
-            "X": "X",
-            "○": "○",
-            "△": "△",
-            "□": "□",
-
-            "L1": "L1",
-            "R1": "R1",
-            "L2": "L2",
-            "R2": "R2",
-
-            "L3": "L3",
-            "R3": "R3",
-
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "Options": "Options",
-            "TouchPad": "TouchPad",
-            "Share": "Share",
-            "PS": "PS"
-        };
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", 0, 255],
+				"1": ["ABS_Y", 0, 255],
+				"2": ["ABS_Z", 0, 255],
+				"3": ["ABS_RX", 0, 255],
+				"4": ["ABS_RY", 0, 255],
+				"5": ["ABS_RZ", 0, 255],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
 
         const dualshockToSwitchJson = {
-            "X": "B",
-            "○": "A",
-            "△": "X",
-            "□": "Y",
-
-            "L1": "L",
-            "R1": "R",
-            "L2": "ZL",
-            "R2": "ZR",
-
-            "L3": "Left Stick",
-            "R3": "Right Stick",
-
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "Options": "+",
-            "TouchPad": "-",
-            "Share": "Capture",
-            "PS": "Home"
-        };
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", 0, 255],
+				"1": ["ABS_Y", 0, 255],
+				"2": ["ABS_Z", 0, 255],
+				"3": ["ABS_RX", 0, 255],
+				"4": ["ABS_RY", 0, 255],
+				"5": ["ABS_RZ", 0, 255],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
 
         const dualshockToXboxJson = {
-            "X": "A",
-            "○": "B",
-            "△": "Y",
-            "□": "X",
-
-            "L1": "LB",
-            "R1": "RB",
-            "L2": "LT",
-            "R2": "RT",
-
-            "L3": "L3",
-            "R3": "R3",
-
-            "D-Pad Up": "D-Pad Up",
-            "D-Pad Down": "D-Pad Down",
-            "D-Pad Left": "D-Pad Left",
-            "D-Pad Right": "D-Pad Right",
-
-            "Options": "Menu",
-            "TouchPad": "View",
-            "Share": "Share",
-            "PS": "Xbox"
-        };
+			"1" : {
+				"304" : "(BTN_SOUTH)",
+				"305" : "(BTN_EAST)",
+				"307" : "(BTN_NORTH)",
+				"308" : "(BTN_WEST)",
+				"310" : "(BTN_TL)",
+				"311" : "(BTN_TR)",
+				"312" : "(BTN_TL2)",
+				"313" : "(BTN_TR2)",
+				"314" : "(BTN_SELECT)",
+				"315" : "(BTN_START)",
+				"316" : "(BTN_MODE)",
+				"317" : "(BTN_THUMBL)",
+				"318" : "(BTN_THUMBR)"
+				},
+			"3" : {
+				"0": ["ABS_X", 0, 255],
+				"1": ["ABS_Y", 0, 255],
+				"2": ["ABS_Z", 0, 255],
+				"3": ["ABS_RX", 0, 255],
+				"4": ["ABS_RY", 0, 255],
+				"5": ["ABS_RZ", 0, 255],
+				"16": ["ABS_HAT0X", -1, 1],
+				"17": ["ABS_HAT0Y", -1, 1]
+				},
+			"21": {
+				"80": "FF_RUMBLE",
+				"81": "FF_PERIODIC",
+				"88": "FF_SQUARE",
+				"89": "FF_TRIANGLE",
+				"90": "FF_SINE",
+				"96": "FF_GAIN"
+			  }
+		};
 
         const defaultSwitchJson = {
             "A": "A",
@@ -689,19 +722,9 @@
 					else if (consoleType == "Playstation 5")
 					else*/
 			}
-			
-			createRemappingRows();
-
-            // Get all of the remapping dropdowns.
-            const remappingSelects = document.querySelectorAll(".output-button");
-            let mappings = {};
-            
-            // Store each physical button's selected output.
-            let physicalButtons = Object.keys(defaultMappings);
-
-            for (let i = 0; i < remappingSelects.length; i++) {
-                mappings[physicalButtons[i]] = remappingSelects[i].value;
-            }
+            // Use the selected controller/console mapping directly.
+            // The editable remapping dropdowns are disabled in the HTML.
+            const mappings = { ...defaultMappings };
 
             // Display current configuration.
             let message = "<strong>Configuration Applied!</strong><br><br>";
@@ -733,20 +756,13 @@
         }
 
 
-        // Reset all mappings to default.
+        // Reset the displayed results. Apply Choices will show the current defaults again.
         function resetMappings() {
-            createRemappingRows();
             document.getElementById("status").style.display = "none";
         }
 
         function initializePage() {
-            // Set up the initial controller and console mappings.
-            applySettings(false);
-            
-            // Update mappings when console or controller is changed.
-            document.getElementById("controllerType").addEventListener("change", () => applySettings(false));
-            document.getElementById("consoleType")
-            .addEventListener("change", () => applySettings(false));
+            // Remapping controls are disabled; mappings appear after Apply Choices.
         }
 
 
@@ -860,11 +876,16 @@
                     </option>
                 </select>
             </div>
+			
         </section>
 
         <!--
         Input Remapping
         -->
+        <!--
+        Input Remapping controls are temporarily disabled.
+        The applied input mappings are still displayed below the configuration section.
+
         <section class="remapping">
             <h2>Input Remapping</h2>
             <p>
@@ -872,20 +893,26 @@
                 output to the console.
             </p>
 
-            <div id="remappingArea">
-
-                <!--
-                JavaScript will eventually create the remapping controls here when we get to that stage.
-                -->
-
-            </div>
+            <div id="remappingArea"></div>
 
             <div class="button-container">
+                <button onclick="applySettings()">
+                    Apply Remapping
+                </button>
+
+                <button onclick="resetMappings()">
+                    Reset to Default
+                </button>
+            </div>
+        </section>
+        -->
+        <section class="remapping">
+		<div class="button-container">
 
                 <button
                     id="applyButton"
                     onclick="applySettings()">
-                    Apply Remapping
+                    Apply Choices
                 </button>
 
                 <button
