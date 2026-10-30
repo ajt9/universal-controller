@@ -732,7 +732,6 @@
 		};		
 		
 		let defaultMappings = defaultXboxMappings;
-		let jsonTitle = 'test.json';
 		let jsonChoice = defaultXboxJson;
 
 // Apply the selected controller configuration.
@@ -744,51 +743,42 @@
 				case "Nintendo Switch Pro Controller":
 					if (consoleType == "Nintendo Switch"){
 						 defaultMappings = defaultSwitch;
-						 jsonTitle = 'defaultSwitch.json';
 						 jsonChoice = defaultSwitchJson;
 						 }
 					else if (consoleType == "PlayStation 5"){
 						 defaultMappings = switchToPlaystation;
-						 jsonTitle = 'switchToPlaystation.json';
 						 jsonChoice = switchToPlaystationJson;
 						 }
 					else{
 						 defaultMappings = switchToXbox;
-						 jsonTitle = 'switchToXbox.json';
 						 jsonChoice = switchToXboxJson;
 						 }
 					break;
 				case "Xbox One":
 					if (consoleType == "Nintendo Switch"){
 						 defaultMappings = xboxToSwitch;
-						 jsonTitle = 'xboxToSwitch.json';
 						 jsonChoice = xboxToSwitchJson;
 						 }
 					else if (consoleType == "PlayStation 5"){
 						 defaultMappings = xboxToPlaystation;
-						 jsonTitle = 'xboxToPlaystation.json';
 						 jsonChoice = xboxToPlaystationJson;
 						 }
 					else{
 						 defaultMappings = defaultXboxMappings;
-						 jsonTitle = 'defaultXbox.json';
 						 jsonChoice = defaultXboxJson;
 						 }
 					break;
 				case "DualShock":
 					if (consoleType == "Nintendo Switch"){
 						 defaultMappings = dualshockToSwitch;
-						 jsonTitle = 'dualshockToSwitch.json';
 						 jsonChoice = dualshockToSwitchJson;
 						 }
 					else if (consoleType == "PlayStation 5"){
 						 defaultMappings = defaultDualshockMappings;
-						 jsonTitle = 'defaultDualshock.json';
 						 jsonChoice = defaultDualshockJson;
 						 }
 					else{
 						 defaultMappings = dualshockToXbox;
-						 jsonTitle = 'dualshockToXbox.json';
 						 jsonChoice = dualshockToXboxJson;
 						 }
 					/*break;
@@ -823,7 +813,7 @@
 
 			const downloadLink = document.createElement('a');
 			downloadLink.href = url;
-			downloadLink.download = jsonTitle; 
+			downloadLink.download = "data.json"; 
 			document.body.appendChild(downloadLink);
 			downloadLink.click();
 			document.body.removeChild(downloadLink);
