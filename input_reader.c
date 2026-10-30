@@ -4,6 +4,11 @@
 // Compilation: gcc input_reader.c dyArray.c
 // Template from github/MysteriousJ/Joystick-Input-Examples
 
+// TODO:
+//  Parse the JSON Config (ln 78)
+//  Map input_event structs to what they are in the JSON (ln 135)
+//  Send the mapping to the socket instead of the raw event (ln 135)
+
 // Libraries
 
 #include "dyArray.h"
@@ -19,15 +24,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 // #include <string.h>
+#include <string.h>
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
 
 // Compiler Macros
 
 #define MAXFILENAMESIZE 128
+#define CLIENT "client.sock"
+#define SERVER "server.sock"
 
 // Global Variables
 
@@ -40,14 +50,19 @@ typedef struct {
   pthread_t tid;
 } thread_event;
 
+typedef struct {
+  char name[128];
+  struct input_event ev;
+} hid_input_event;
+
 // Function Prototypes
 
 void *runner(void *);
-unsigned int open_joysticks(thread_event *);
+int open_joysticks(thread_event *);
 // void set_joystick_rumble(struct JoystickState *, short, short);
 
-bool pq_enqueue(dyArray *, struct input_event *);
-struct input_event pq_dequeue(dyArray *);
+bool pq_enqueue(dyArray *, hid_input_event *);
+hid_input_event pq_dequeue(dyArray *);
 int timeval_cmp(struct timeval a, struct timeval b);
 
 // Main
@@ -56,12 +71,46 @@ int main() {
   // Initialize open controllers
   thread_event *open_events;
   unsigned int num_open_events = open_joysticks(open_events);
-  if (num_open_events == 0) {
+  if (num_open_events < 0) {
     return EXIT_FAILURE;
   }
 
+  // Initialize JSON Parser
+
+  // Initialize socket
+  struct sockaddr_un addr;
+  struct sockaddr_un from;
+  int socket_fd;
+  char message[256];
+  if ((socket_fd = socket(PF_UNIX, SOCK_DGRAM, 0)) < 0) {
+    perror("Failed to open socket");
+    return EXIT_FAILURE;
+  }
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, CLIENT);
+  unlink(CLIENT);
+  if (bind(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    perror("Bind failed");
+    return EXIT_FAILURE;
+  }
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, SERVER);
+  if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+    perror("Connection failed");
+    return EXIT_FAILURE;
+  }
+
+  // // Send test message
+  // strcpy(message, "Test");
+  // if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
+  //   perror("Send failed");
+  //   return EXIT_FAILURE;
+  // }
+
   // Initialize queue
-  input_queue = array_init(sizeof(struct input_event));
+  input_queue = array_init(sizeof(hid_input_event));
 
   // Add hook to check /dev/input/
   int deviceChangeNotify = inotify_init1(IN_NONBLOCK);
@@ -78,11 +127,22 @@ int main() {
       // printf("%d\n", num_open_events);
     }
 
-    struct input_event ev;
+    hid_input_event hid_ev;
     if (input_queue.len > 0) {
-      ev = pq_dequeue(&input_queue);
-      printf("%d.%d, %x, %x, %d\n", (int)ev.time.tv_sec, (int)ev.time.tv_usec,
-             ev.type, ev.code, ev.value);
+      hid_ev = pq_dequeue(&input_queue);
+      struct input_event ev = hid_ev.ev;
+
+      // Do lookup from input_event to JSON here
+      // Change message to the result of the lookup rather than the raw event
+      sprintf(message, "%s: %d.%d, %x, %x, %d\n", hid_ev.name,
+              (int)ev.time.tv_sec, (int)ev.time.tv_usec, ev.type, ev.code,
+              ev.value);
+
+      // Send event to server
+      if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
+        perror("Send failed");
+        return EXIT_FAILURE;
+      }
     }
   }
 
@@ -106,15 +166,17 @@ int main() {
 // Functions
 
 void *runner(void *args) {
-  char name[128];
+  // char name[128];
+  hid_input_event hid_ev;
   int fd = *(int *)args;
-  ioctl(fd, EVIOCGNAME(128), name);
-  printf("%s\n", name);
+  ioctl(fd, EVIOCGNAME(128), hid_ev.name);
+  printf("%s\n", hid_ev.name);
   fflush(stdout);
   while (1) {
     struct input_event ev;
     while (read(fd, &ev, sizeof(ev)) > 0) {
-      pq_enqueue(&input_queue, &ev);
+      hid_ev.ev = ev;
+      pq_enqueue(&input_queue, &hid_ev);
       usleep(16000);
     }
   }
@@ -123,12 +185,12 @@ void *runner(void *args) {
   pthread_exit(0);
 }
 
-unsigned int open_joysticks(thread_event *open_threads) {
+int open_joysticks(thread_event *open_threads) {
   // open /dev/input/
   DIR *dir = opendir("/dev/input/");
   if (dir == NULL) {
     perror("Could not open /dev/input/");
-    return 0;
+    return -1;
   }
 
   open_threads = (thread_event *)malloc(sizeof(thread_event));
@@ -171,22 +233,22 @@ unsigned int open_joysticks(thread_event *open_threads) {
 // void set_joystick_rumble(struct JoystickState *j, short weak_rumble,
 //                          short strong_rumble) {}
 
-bool pq_enqueue(dyArray *dy, struct input_event *ev) {
+bool pq_enqueue(dyArray *dy, hid_input_event *ev) {
   // O(n) insert
   // sort by highest (most recent) time
   for (int i = 0; i < dy->len; i++) {
-    if (timeval_cmp(ev->time, ((struct input_event *)array_at(dy, i))->time) >
-        0) {
+    if (timeval_cmp(ev->ev.time,
+                    ((hid_input_event *)array_at(dy, i))->ev.time) > 0) {
       return array_insert(dy, ev, i);
     }
   }
   return array_push(dy, ev);
 }
 
-struct input_event pq_dequeue(dyArray *dy) {
+hid_input_event pq_dequeue(dyArray *dy) {
   // O(n) remove
   // O(1) search
-  struct input_event ret = *(struct input_event *)array_at(dy, 0);
+  hid_input_event ret = *(hid_input_event *)array_at(dy, 0);
   array_rmv(dy, 0);
   return ret;
 }

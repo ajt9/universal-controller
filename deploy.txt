@@ -1,0 +1,14 @@
+*************************************************************************************************************
+*                                          TO RUN UNIVERSAL CONTROLLER                                      *
+*                                                                                                           *
+*  Ensure your Universal Controller is connected to a power source and turned on. Plug your Universal       *
+*  Controller into your personal laptop or desktop computer. Using the web browser that automatically       *
+*  opens, select your desired controller and console type, and hit "Apply Choices". Then, you may unplug    *
+*  your Universal Controller from you laptop or desktop computer, and plug the Universal Controller into    *
+*  your desired console. Finally, connect your controller to the Universal Controller using a standard      *
+*  Bluetooth connection for your desired controller, and enjoy using Universal Controller.                  *
+*                                                                                                           *
+*                                          TO STOP UNIVERSAL CONTROLLER                                     *
+*  Simply disconnect Universal Controller from your console and from the power source to turn off           *
+*  Universal Controller.                                                                                    *
+*************************************************************************************************************
