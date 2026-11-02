@@ -76,6 +76,30 @@ int main() {
   }
 
   // Initialize JSON Parser
+  // open the file
+  FILE *fp = fopen("data.json", "r");
+  if (fp == NULL) {
+    printf("Error: Unable to open the file.\n");
+    return 1;
+  }
+  // read the file contents into a string
+  char buffer[1024];
+  int len = fread(buffer, 1, sizeof(buffer), fp);
+  fclose(fp);
+  
+  // parse the JSON data
+  cJSON *json = cJSON_Parse(buffer);
+  if (json == NULL) {
+    const char *error_ptr = cJSON_GetErrorPtr();
+    if (error_ptr != NULL) {
+      printf("Error: %s\n", error_ptr);
+    }
+    cJSON_Delete(json);
+    return 1;
+  }
+  // delete the JSON object
+  cJSON_Delete(json);
+  return 0;
 
   // Initialize socket
   struct sockaddr_un addr;
