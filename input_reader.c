@@ -1,10 +1,9 @@
 // Author: AJ Tomalino
 // File: input_reader.c
 // Purpose: read and write controller inputs using the EVDEV linux kernel API
-// Compilation: gcc input_reader.c dyArray.c
+// Compilation: gcc input_reader.c dyArray.c cJSON.c
 
 // TODO:
-// Translate events via cJSON (ln 153)
 
 // Libraries
 
@@ -130,55 +129,34 @@ int main() {
       perror("Failed while waiting for I/O");
       return EXIT_FAILURE;
     }
-    // printf("epoll recieved!\n");
 
+    // If event is from inotify
     if (event.data.ptr == &inotify_ID) {
+      // Disregard event
       char buffer[4096];
       while (read(inotify_fd, buffer, sizeof(buffer)) > 0)
         ;
-      // printf("Devices Changed\n");
+      // Reopen joysticks
       close_joysticks(epoll_fd);
       open_joysticks(epoll_fd);
       continue;
     }
-    //
-    // hid_input_event hid_ev;
-    // if (input_queue.len > 0) {
-    //     hid_ev = pq_dequeue(&input_queue);
-    //     struct input_event ev = hid_ev.ev;
-    //
-    //     // Do lookup from input_event to JSON here
-    //     char input_name[128];
-    //     if (map_input_event(json, &ev, input_name, sizeof(input_name))) {
-    //         //send message of the result of the lookup rather than the raw
-    //         event
-    //         snprintf(message, sizeof(message), "%s: %s = %d\n",
-    //         hid_ev.name, input_name, ev.value);
-    //         // Send event to server
-    //         if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
-    //             perror("Send failed");
-    //             return EXIT_FAILURE;
-    //         }// end if
-    //     }// end if
-    // }//end if
+
+    // Joystick IO
     if (open_events.len > 0) {
       // Read from IO fd
       struct input_event ev;
       struct device dev = *(struct device *)event.data.ptr;
-      // printf("fd outside open: %d\n", dev.fd);
-      // printf("%s\n", dev.name);
       const ssize_t bytes = read(dev.fd, &ev, sizeof(ev));
       if (bytes < 0) {
         fprintf(stderr, "Failed to read I/O from %s: ", dev.name);
         perror("");
         return EXIT_FAILURE;
-        // }
       } else if (bytes != sizeof(ev)) {
         continue;
       }
 
-      // Translate event here
-      // Do lookup from input_event to JSON here
+      // Translate event
       char input_name[128];
       if (map_input_event(json, &ev, input_name, sizeof(input_name))) {
         // send message of the result of the lookup rather than the raw event
@@ -190,24 +168,8 @@ int main() {
           return EXIT_FAILURE;
         }
       }
-
-      // // Send Message
-      // char message[256];
-      // sprintf(message, "%s: %d.%d, %d, %d, %d\n", dev.name,
-      // (int)ev.time.tv_sec,
-      //         (int)ev.time.tv_usec, ev.type, ev.code, ev.value);
-      // // printf("%s", message);
-      // if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
-      //   perror("Send failed");
-      //   return EXIT_FAILURE;
-      // }
     }
   }
-  //
-  // if (close(epoll_fd) < 0) {
-  //   perror("Could not destroy epoll");
-  // }
-  //
   return EXIT_SUCCESS;
 }
 
