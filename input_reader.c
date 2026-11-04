@@ -10,7 +10,7 @@
 //  Send the mapping to the socket instead of the raw event (ln 135)
 
 // Libraries
-
+#include "cJSON.h"
 #include "dyArray.h"
 #include <bits/types/struct_timeval.h>
 #include <dirent.h>
@@ -65,6 +65,8 @@ bool pq_enqueue(dyArray *, hid_input_event *);
 hid_input_event pq_dequeue(dyArray *);
 int timeval_cmp(struct timeval a, struct timeval b);
 
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size_t name_size);
+
 // Main
 
 int main() {
@@ -97,9 +99,6 @@ int main() {
     cJSON_Delete(json);
     return 1;
   }
-  // delete the JSON object
-  cJSON_Delete(json);
-  return 0;
 
   // Initialize socket
   struct sockaddr_un addr;
@@ -153,21 +152,21 @@ int main() {
 
     hid_input_event hid_ev;
     if (input_queue.len > 0) {
-      hid_ev = pq_dequeue(&input_queue);
-      struct input_event ev = hid_ev.ev;
-
-      // Do lookup from input_event to JSON here
-      // Change message to the result of the lookup rather than the raw event
-      sprintf(message, "%s: %d.%d, %x, %x, %d\n", hid_ev.name,
-              (int)ev.time.tv_sec, (int)ev.time.tv_usec, ev.type, ev.code,
-              ev.value);
-
-      // Send event to server
-      if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
-        perror("Send failed");
-        return EXIT_FAILURE;
-      }
-    }
+        hid_ev = pq_dequeue(&input_queue);
+        struct input_event ev = hid_ev.ev;
+        
+        // Do lookup from input_event to JSON here
+        char input_name[128];
+        if (map_input_event(json, &ev, input_name, sizeof(input_name))) {
+            //send message of the result of the lookup rather than the raw event
+            snprintf(message, sizeof(message), "%s: %s = %d\n", hid_ev.name, input_name, ev.value);
+            // Send event to server
+            if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
+                perror("Send failed");
+                return EXIT_FAILURE;
+            }// end if
+        }// end if
+    }//end if
   }
 
   // technically this code is never executed but its good practice
@@ -188,6 +187,59 @@ int main() {
 }
 
 // Functions
+
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size_t name_size) {
+
+  char type_key[16];
+  char code_key[16];
+
+  // Convert event type and code into JSON keys
+  snprintf(type_key, sizeof(type_key), "%u", ev->type);
+  snprintf(code_key, sizeof(code_key), "%u", ev->code);
+
+  // Find the event type in the JSON configuration
+  cJSON *type_object =
+      cJSON_GetObjectItemCaseSensitive(json, type_key);
+
+  if (!cJSON_IsObject(type_object)) {
+    return false;
+  }//end if
+
+  // Find the specific event code
+  cJSON *mapping = cJSON_GetObjectItemCaseSensitive(type_object, code_key);
+  if (mapping == NULL) {
+    return false;
+  }//end if
+
+  // Handle button and force-feedback mappings
+  if (cJSON_IsString(mapping)) {
+    snprintf(input_name, name_size, "%s", mapping->valuestring);
+    // Remove parentheses from button names
+    size_t len = strlen(input_name);
+    if (len >= 2 &&
+        input_name[0] == '(' &&
+        input_name[len - 1] == ')') {
+      memmove(input_name, input_name + 1, len - 2);
+      input_name[len - 2] = '\0';
+    }//end if
+
+    return true;
+  }//end if
+
+  // Handle analog inputs (ABS_X, ABS_Y, etc.)
+  if (cJSON_IsArray(mapping)) {
+
+    cJSON *axis_name = cJSON_GetArrayItem(mapping, 0);
+
+    if (!cJSON_IsString(axis_name)) {
+      return false;
+    }//end if
+    snprintf(input_name, name_size, "%s", axis_name->valuestring);
+    return true;
+  }//end if
+  return false;
+}//end map_input_event
+
 
 void *runner(void *args) {
   // char name[128];
