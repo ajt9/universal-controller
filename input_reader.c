@@ -48,7 +48,6 @@ struct device {
 
 bool open_joysticks(int);
 bool close_joysticks(int);
-
 bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
                      size_t name_size);
 
@@ -242,12 +241,9 @@ bool open_joysticks(int epoll_fd) {
       char path[MAXFILENAMESIZE];
       sprintf(path, "/dev/input/%s", entry->d_name);
       int fd = open(path, O_RDWR | O_NONBLOCK);
-      // printf("Found: %s\n", path);
       // opens any device with read-write permission
       // fails if else
       if (fd != -1) {
-        // printf("fd in open: %d\n", fd);
-
         // add fd to epoll
         struct device *dev = malloc(sizeof(*dev));
         dev->fd = fd;
@@ -260,17 +256,11 @@ bool open_joysticks(int epoll_fd) {
           perror("");
           return false;
         }
-        // printf("Opened: %s | %s\n", path, dev->name);
         // add dev to open array
         array_push(&open_events, &dev);
       }
     }
   }
-
-  // for (int i = 0; i < open_events.len; i++) {
-  //   struct device *dev = *(struct device **)array_at(&open_events, i);
-  //   printf("Opened %s %d\n", dev->name, dev->fd);
-  // }
 
   return true;
 }
@@ -278,7 +268,6 @@ bool open_joysticks(int epoll_fd) {
 bool close_joysticks(int epoll_fd) {
   while (open_events.len > 0) {
     struct device *dev = *(struct device **)array_at(&open_events, 0);
-    // printf("Closing %s %d\n", dev->name, dev->fd);
     array_rmv(&open_events, 0);
     if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, dev->fd, NULL) < 0) {
       perror("Failed to remove event");
