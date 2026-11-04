@@ -1,10 +1,9 @@
 // Author: AJ Tomalino
 // File: input_reader.c
 // Purpose: read and write controller inputs using the EVDEV linux kernel API
-// Compilation: gcc input_reader.c dyArray.c
+// Compilation: gcc input_reader.c dyArray.c cJSON.c
 
 // TODO:
-// Translate events via cJSON (ln 153)
 
 // Libraries
 
@@ -49,6 +48,9 @@ struct device {
 
 bool open_joysticks(int);
 bool close_joysticks(int);
+
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
+                     size_t name_size);
 
 // Main
 
@@ -127,56 +129,101 @@ int main() {
       perror("Failed while waiting for I/O");
       return EXIT_FAILURE;
     }
-    // printf("epoll recieved!\n");
 
+    // If event is from inotify
     if (event.data.ptr == &inotify_ID) {
+      // Disregard event
       char buffer[4096];
       while (read(inotify_fd, buffer, sizeof(buffer)) > 0)
         ;
-      // printf("Devices Changed\n");
+      // Reopen joysticks
       close_joysticks(epoll_fd);
       open_joysticks(epoll_fd);
       continue;
     }
 
+    // Joystick IO
     if (open_events.len > 0) {
       // Read from IO fd
       struct input_event ev;
       struct device dev = *(struct device *)event.data.ptr;
-      // printf("fd outside open: %d\n", dev.fd);
-      // printf("%s\n", dev.name);
       const ssize_t bytes = read(dev.fd, &ev, sizeof(ev));
       if (bytes < 0) {
         fprintf(stderr, "Failed to read I/O from %s: ", dev.name);
         perror("");
         return EXIT_FAILURE;
-        // }
       } else if (bytes != sizeof(ev)) {
         continue;
       }
 
-      // Translate event here
-
-      // Send Message
-      char message[256];
-      sprintf(message, "%s: %d.%d, %d, %d, %d\n", dev.name, (int)ev.time.tv_sec,
-              (int)ev.time.tv_usec, ev.type, ev.code, ev.value);
-      // printf("%s", message);
-      if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
-        perror("Send failed");
-        return EXIT_FAILURE;
+      // Translate event
+      char input_name[128];
+      if (map_input_event(json, &ev, input_name, sizeof(input_name))) {
+        // send message of the result of the lookup rather than the raw event
+        snprintf(message, sizeof(message), "%s: %s = %d\n", dev.name,
+                 input_name, ev.value);
+        //  Send event to server
+        if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
+          perror("Send failed");
+          return EXIT_FAILURE;
+        }
       }
     }
   }
-  //
-  // if (close(epoll_fd) < 0) {
-  //   perror("Could not destroy epoll");
-  // }
-  //
   return EXIT_SUCCESS;
 }
 
 // Functions
+
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
+                     size_t name_size) {
+
+  char type_key[16];
+  char code_key[16];
+
+  // Convert event type and code into JSON keys
+  snprintf(type_key, sizeof(type_key), "%u", ev->type);
+  snprintf(code_key, sizeof(code_key), "%u", ev->code);
+
+  // Find the event type in the JSON configuration
+  cJSON *type_object = cJSON_GetObjectItemCaseSensitive(json, type_key);
+
+  if (!cJSON_IsObject(type_object)) {
+    return false;
+  } // end if
+
+  // Find the specific event code
+  cJSON *mapping = cJSON_GetObjectItemCaseSensitive(type_object, code_key);
+  if (mapping == NULL) {
+    return false;
+  } // end if
+
+  // Handle button and force-feedback mappings
+  if (cJSON_IsString(mapping)) {
+    snprintf(input_name, name_size, "%s", mapping->valuestring);
+    // Remove parentheses from button names
+    size_t len = strlen(input_name);
+    if (len >= 2 && input_name[0] == '(' && input_name[len - 1] == ')') {
+      memmove(input_name, input_name + 1, len - 2);
+      input_name[len - 2] = '\0';
+    } // end if
+
+    return true;
+  } // end if
+
+  // Handle analog inputs (ABS_X, ABS_Y, etc.)
+  if (cJSON_IsArray(mapping)) {
+
+    cJSON *axis_name = cJSON_GetArrayItem(mapping, 0);
+
+    if (!cJSON_IsString(axis_name)) {
+      return false;
+    } // end if
+    snprintf(input_name, name_size, "%s", axis_name->valuestring);
+    return true;
+  } // end if
+  return false;
+} // end map_input_event
 
 bool open_joysticks(int epoll_fd) {
   // open /dev/input/
