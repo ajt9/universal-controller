@@ -1,20 +1,30 @@
-name: Linter
+name: Lint Code Base
 
 on:
   push:
-    branches: [ master ]
+    branches: [main, master]
   pull_request:
-    branches: [ master ]
+    branches: [main, master]
 
 jobs:
-  build:
+  run-lint:
+    name: Lint Code Base
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
 
-    - name: Super-Linter
-      uses: docker://github/super-linter:latest
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VALIDATE_TERRAFORM_TERRASCAN: false
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # Super-Linter needs full git history to check changed files
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: super-linter/super-linter@v7
+        env:
+          VALIDATE_ALL_CODEBASE: false # Only lints modified files on PRs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
