@@ -50,7 +50,8 @@ struct device {
 bool open_joysticks(int);
 bool close_joysticks(int);
 
-bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size_t name_size);
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
+                     size_t name_size);
 
 // Main
 
@@ -140,24 +141,26 @@ int main() {
       open_joysticks(epoll_fd);
       continue;
     }
-
-    hid_input_event hid_ev;
-    if (input_queue.len > 0) {
-        hid_ev = pq_dequeue(&input_queue);
-        struct input_event ev = hid_ev.ev;
-        
-        // Do lookup from input_event to JSON here
-        char input_name[128];
-        if (map_input_event(json, &ev, input_name, sizeof(input_name))) {
-            //send message of the result of the lookup rather than the raw event
-            snprintf(message, sizeof(message), "%s: %s = %d\n", hid_ev.name, input_name, ev.value);
-            // Send event to server
-            if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
-                perror("Send failed");
-                return EXIT_FAILURE;
-            }// end if
-        }// end if
-    }//end if
+    //
+    // hid_input_event hid_ev;
+    // if (input_queue.len > 0) {
+    //     hid_ev = pq_dequeue(&input_queue);
+    //     struct input_event ev = hid_ev.ev;
+    //
+    //     // Do lookup from input_event to JSON here
+    //     char input_name[128];
+    //     if (map_input_event(json, &ev, input_name, sizeof(input_name))) {
+    //         //send message of the result of the lookup rather than the raw
+    //         event
+    //         snprintf(message, sizeof(message), "%s: %s = %d\n",
+    //         hid_ev.name, input_name, ev.value);
+    //         // Send event to server
+    //         if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
+    //             perror("Send failed");
+    //             return EXIT_FAILURE;
+    //         }// end if
+    //     }// end if
+    // }//end if
     if (open_events.len > 0) {
       // Read from IO fd
       struct input_event ev;
@@ -175,16 +178,29 @@ int main() {
       }
 
       // Translate event here
-
-      // Send Message
-      char message[256];
-      sprintf(message, "%s: %d.%d, %d, %d, %d\n", dev.name, (int)ev.time.tv_sec,
-              (int)ev.time.tv_usec, ev.type, ev.code, ev.value);
-      // printf("%s", message);
-      if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
-        perror("Send failed");
-        return EXIT_FAILURE;
+      // Do lookup from input_event to JSON here
+      char input_name[128];
+      if (map_input_event(json, &ev, input_name, sizeof(input_name))) {
+        // send message of the result of the lookup rather than the raw event
+        snprintf(message, sizeof(message), "%s: %s = %d\n", dev.name,
+                 input_name, ev.value);
+        //  Send event to server
+        if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
+          perror("Send failed");
+          return EXIT_FAILURE;
+        }
       }
+
+      // // Send Message
+      // char message[256];
+      // sprintf(message, "%s: %d.%d, %d, %d, %d\n", dev.name,
+      // (int)ev.time.tv_sec,
+      //         (int)ev.time.tv_usec, ev.type, ev.code, ev.value);
+      // // printf("%s", message);
+      // if (send(socket_fd, message, strlen(message) + 1, 0) == -1) {
+      //   perror("Send failed");
+      //   return EXIT_FAILURE;
+      // }
     }
   }
   //
@@ -197,7 +213,8 @@ int main() {
 
 // Functions
 
-bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size_t name_size) {
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
+                     size_t name_size) {
 
   char type_key[16];
   char code_key[16];
@@ -207,33 +224,30 @@ bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size
   snprintf(code_key, sizeof(code_key), "%u", ev->code);
 
   // Find the event type in the JSON configuration
-  cJSON *type_object =
-      cJSON_GetObjectItemCaseSensitive(json, type_key);
+  cJSON *type_object = cJSON_GetObjectItemCaseSensitive(json, type_key);
 
   if (!cJSON_IsObject(type_object)) {
     return false;
-  }//end if
+  } // end if
 
   // Find the specific event code
   cJSON *mapping = cJSON_GetObjectItemCaseSensitive(type_object, code_key);
   if (mapping == NULL) {
     return false;
-  }//end if
+  } // end if
 
   // Handle button and force-feedback mappings
   if (cJSON_IsString(mapping)) {
     snprintf(input_name, name_size, "%s", mapping->valuestring);
     // Remove parentheses from button names
     size_t len = strlen(input_name);
-    if (len >= 2 &&
-        input_name[0] == '(' &&
-        input_name[len - 1] == ')') {
+    if (len >= 2 && input_name[0] == '(' && input_name[len - 1] == ')') {
       memmove(input_name, input_name + 1, len - 2);
       input_name[len - 2] = '\0';
-    }//end if
+    } // end if
 
     return true;
-  }//end if
+  } // end if
 
   // Handle analog inputs (ABS_X, ABS_Y, etc.)
   if (cJSON_IsArray(mapping)) {
@@ -242,35 +256,13 @@ bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size
 
     if (!cJSON_IsString(axis_name)) {
       return false;
-    }//end if
+    } // end if
     snprintf(input_name, name_size, "%s", axis_name->valuestring);
     return true;
-  }//end if
+  } // end if
   return false;
-}//end map_input_event
+} // end map_input_event
 
-
-void *runner(void *args) {
-  // char name[128];
-  hid_input_event hid_ev;
-  int fd = *(int *)args;
-  ioctl(fd, EVIOCGNAME(128), hid_ev.name);
-  printf("%s\n", hid_ev.name);
-  fflush(stdout);
-  while (1) {
-    struct input_event ev;
-    while (read(fd, &ev, sizeof(ev)) > 0) {
-      hid_ev.ev = ev;
-      pq_enqueue(&input_queue, &hid_ev);
-      usleep(16000);
-    }
-  }
-  close(fd);
-
-  pthread_exit(0);
-}
-
-int open_joysticks(thread_event *open_threads) {
 bool open_joysticks(int epoll_fd) {
   // open /dev/input/
   DIR *dir = opendir("/dev/input/");
