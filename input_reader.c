@@ -174,8 +174,11 @@ int main() {
 
 // Functions
 
-bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
-                     size_t name_size) {
+// Function Name: map_input_event
+// Description: Maps the input events based on the JSON file.
+// Input: cJson json, struct input_event, char input_name, size_t name_size
+// Output: bool
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size_t name_size) {
 
   char type_key[16];
   char code_key[16];
@@ -224,6 +227,10 @@ bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
   return false;
 } // end map_input_event
 
+// Function name: open_joysticks
+// Description: 
+// Input: int epoll_fd
+// Output: bool
 bool open_joysticks(int epoll_fd) {
   // open /dev/input/
   DIR *dir = opendir("/dev/input/");
@@ -265,6 +272,10 @@ bool open_joysticks(int epoll_fd) {
   return true;
 }
 
+// Function Name: close_joysticks
+// Description: 
+// Input: int e_pollfd
+// Output: bool
 bool close_joysticks(int epoll_fd) {
   while (open_events.len > 0) {
     struct device *dev = *(struct device **)array_at(&open_events, 0);
