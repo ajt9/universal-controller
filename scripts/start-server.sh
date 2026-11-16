@@ -6,7 +6,7 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PORT=8000
 
 # Verify HTML file exists.
-if [ ! -f "$PROJECT_DIR/UniversalControllerWebServer.html" ]; then
+if [ ! -f "$PROJECT_DIR/CMAPIWebServer.html" ]; then
     echo "Error: HTML file not found!"
     exit 1
 fi
