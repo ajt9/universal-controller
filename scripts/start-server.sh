@@ -18,3 +18,5 @@ exec python3 -m http.server \
     "$PORT" \
     --bind 0.0.0.0 \
     --directory "$PROJECT_DIR"
+
+# html file accessible at http://10.12.194.1:8000/UniversalControllerWebServer.html
