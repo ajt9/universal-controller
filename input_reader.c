@@ -73,7 +73,8 @@ int main() {
   }
 
   char buffer[2048];
-  int len = fread(buffer, 1, sizeof(buffer), fp);
+  int len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+  buffer[len] = '\0';
   fclose(fp);
 
   cJSON *json = cJSON_Parse(buffer);
@@ -178,7 +179,8 @@ int main() {
 // Description: Maps the input events based on the JSON file.
 // Input: cJson json, struct input_event, char input_name, size_t name_size
 // Output: bool
-bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size_t name_size) {
+bool map_input_event(cJSON *json, struct input_event *ev, char *input_name,
+                     size_t name_size) {
 
   char type_key[16];
   char code_key[16];
@@ -228,7 +230,7 @@ bool map_input_event(cJSON *json, struct input_event *ev, char *input_name, size
 } // end map_input_event
 
 // Function name: open_joysticks
-// Description: 
+// Description:
 // Input: int epoll_fd
 // Output: bool
 bool open_joysticks(int epoll_fd) {
@@ -273,7 +275,7 @@ bool open_joysticks(int epoll_fd) {
 }
 
 // Function Name: close_joysticks
-// Description: 
+// Description:
 // Input: int e_pollfd
 // Output: bool
 bool close_joysticks(int epoll_fd) {
